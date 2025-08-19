@@ -76,3 +76,43 @@ exports.deleteUser = async (userId) => {
     message: resMessage.USER_DELETED,
   };
 };
+
+// exports.updateUser = async (userId, updates) => {
+//   const User = getUserModel();
+//   const user = await User.findByIdAndUpdate(userId, updates, { new: true });
+//   if (!user) throw new Error(resMessage.USER_NOT_FOUND);
+
+//   return {
+//     success: true,
+//     status: statusCode.OK,
+//     message: resMessage.USER_UPDATED,
+//     data: user,
+//   };
+// };
+
+// exports.banUnbanUser = async (userId, isBanned) => {
+//   const User = getUserModel();
+//   const user = await User.findByIdAndUpdate(userId, { isBanned }, { new: true });
+//   if (!user) throw new Error(resMessage.USER_NOT_FOUND);
+
+//   return {
+//     success: true,
+//     status: statusCode.OK,
+//     message: isBanned ? resMessage.USER_BANNED : resMessage.USER_UNBANNED,
+//     data: user,
+//   };
+// };
+
+// exports.verifyKYC = async (userId, kycStatus) => {
+//   const User = getUserModel();
+//   const user = await User.findByIdAndUpdate(userId, { kycVerified: kycStatus }, { new: true });
+//   if (!user) throw new Error(resMessage.USER_NOT_FOUND);
+
+//   return {
+//     success: true,
+//     status: statusCode.OK,
+//     message: resMessage.KYC_UPDATED,
+//     data: user,
+//   };
+// };
+

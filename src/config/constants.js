@@ -17,7 +17,11 @@ const resMessage = {
   USER_EXISTS: "User already exists",
   USER_CREATED: "User created successfully",
   USER_NOT_FOUND: "User not found",
-  USER_DELETED: "User deleted successfully"
+  USER_DELETED: "User deleted successfully",
+  USER_UPDATED : "User updated successfully",
+  USER_BANNED : "User has been banned",
+  USER_UNBANNED : "User has been unbanned",
+  KYC_UPDATED : "KYC status updated successfully"
 };
 
 module.exports = { statusCode, resMessage };
