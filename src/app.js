@@ -6,7 +6,13 @@ const app = express();
 
 // Middlewares
 app.use(express.json());
-app.use(cors());
+
+// Allow ALL origins, ALL IPs, ALL headers
+app.use(cors({
+  origin: '*',  
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: ['*'] // allow all headers
+}));
 
 // Routes
 app.use('/api/admin', adminRoutes);
