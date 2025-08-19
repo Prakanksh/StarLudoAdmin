@@ -33,3 +33,16 @@ exports.login = async ({ email, password }) => {
     },
   };
 };
+
+exports.getDashboard = async (adminId) => {
+  const admin = await Admin.findById(adminId).select("-password");
+  if (!admin) {
+    throw new Error("Admin not found");
+  }
+
+  return {
+    success: true,
+    message: "Admin dashboard fetched",
+    data: admin,
+  };
+};
