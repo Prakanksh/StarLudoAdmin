@@ -227,7 +227,6 @@ exports.updateUser = async (userId, userData) => {
       };
     }
 
-    // Update only the eKYC relevant fields
     const fieldsToUpdate = [
       "fullName",
       "dob",
@@ -237,11 +236,21 @@ exports.updateUser = async (userId, userData) => {
       "email"
     ];
 
-    fieldsToUpdate.forEach(field => {
+    for (const field of fieldsToUpdate) {
       if (userData[field] !== undefined) {
+        if (field === "aadhaarNumber") {
+          const existing = await User.findOne({ aadhaarNumber: userData.aadhaarNumber, _id: { $ne: userId } });
+          if (existing) {
+            return {
+              success: false,
+              status: statusCode.CONFLICT,
+              message: "Aadhaar number already exists for another user"
+            };
+          }
+        }
         user[field] = userData[field];
       }
-    });
+    }
 
     await user.save();
 
