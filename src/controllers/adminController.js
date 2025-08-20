@@ -35,3 +35,7 @@ exports.banUnbanUser = async (req) => {
   return result;
 };
 
+exports.updateUser = async (req) => {
+  const result = await adminService.updateUser(req.params.id, req.body);
+  return result;
+};

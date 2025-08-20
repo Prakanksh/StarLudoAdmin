@@ -211,3 +211,50 @@ exports.banUnbanUser = async (userId, isBanned) => {
     };
   }
 };
+
+exports.updateUser = async (userId, userData) => {
+  try {
+    const User = getUserModel();
+    if (!User) throw new Error(resMessage.USER_MODEL_NOT_INITIALIZED);
+
+    const user = await User.findById(userId);
+    if (!user) {
+      return {
+        status: statusCode.NOT_FOUND,
+        success: false,
+        message: resMessage.USER_NOT_FOUND
+      };
+    }
+
+    // Update only the eKYC relevant fields
+    const fieldsToUpdate = [
+      "fullName",
+      "dob",
+      "gender",
+      "aadhaarNumber",
+      "address",
+      "email"
+    ];
+
+    fieldsToUpdate.forEach(field => {
+      if (userData[field] !== undefined) {
+        user[field] = userData[field];
+      }
+    });
+
+    await user.save();
+
+    return {
+      success: true,
+      status: statusCode.OK,
+      message: resMessage.USER_UPDATED,
+      data: user
+    };
+  } catch (error) {
+    return {
+      status: statusCode.INTERNAL_SERVER_ERROR,
+      success: false,
+      message: error.message || resMessage.Server_error
+    };
+  }
+};

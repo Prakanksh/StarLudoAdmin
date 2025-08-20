@@ -9,7 +9,18 @@ const userSchema = new mongoose.Schema(
     otp: { type: String },
     otpExpire: { type: Date },
     isRegistered: { type: Boolean, default: false },
-    isBanned: { type: Boolean, default: false }
+    isBanned: { type: Boolean, default: false },
+    fullName: { type: String },         
+    dob: { type: Date },                
+    gender: { type: String },           
+    aadhaarNumber: { type: String },    
+    address: { type: String },        
+    email: { type: String },            
+    kycStatus: { 
+      type: String, 
+      enum: ["Pending", "Active" , "Rejected"], 
+      default: "Pending" 
+    } 
   },
   { timestamps: true }
 );
