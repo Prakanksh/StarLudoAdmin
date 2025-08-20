@@ -262,29 +262,47 @@ exports.updateUser = async (userId, userData) => {
       };
     }
 
-    const fieldsToUpdate = [
-      "fullName",
-      "dob",
-      "gender",
-      "aadhaarNumber",
-      "address",
-      "email"
+    // Fields that cannot be updated
+    const restrictedFields = [
+      "phone",
+      "otp",
+      "otpExpire",
+      "isRegistered",
+      "kycStatus"
     ];
 
-    for (const field of fieldsToUpdate) {
-      if (userData[field] !== undefined) {
-        if (field === "aadhaarNumber") {
-          const existing = await User.findOne({ aadhaarNumber: userData.aadhaarNumber, _id: { $ne: userId } });
-          if (existing) {
-            return {
-              success: false,
-              status: statusCode.CONFLICT,
-              message: "Aadhaar number already exists for another user"
-            };
-          }
-        }
-        user[field] = userData[field];
+    // Loop through received keys in request body
+    for (const key of Object.keys(userData)) {
+      if (restrictedFields.includes(key)) {
+        continue; // Skip restricted fields
       }
+
+      // Aadhaar-specific condition
+      if (key === "aadhaarNumber") {
+        if (user.kycStatus === "Verified") {
+          return {
+            success: false,
+            status: statusCode.FORBIDDEN,
+            message: "Aadhaar number cannot be updated after KYC is verified"
+          };
+        }
+
+        // Check if Aadhaar already exists for another user
+        const existing = await User.findOne({
+          aadhaarNumber: userData.aadhaarNumber,
+          _id: { $ne: userId }
+        });
+        if (existing) {
+          return {
+            success: false,
+            status: statusCode.CONFLICT,
+            message: "Aadhaar number already exists for another user"
+          };
+        }
+      }
+
+      // Apply update
+      user[key] = userData[key];
     }
 
     await user.save();
