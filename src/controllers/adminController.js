@@ -20,3 +20,12 @@ exports.deleteUser = async (req) => {
   return result;
 };
 
+exports.getUserById = async (req) => {
+  const result = await adminService.getUserById(req.params.id);
+  return result;
+};
+
+exports.getAllUsers = async (req) => {
+  const result = await adminService.getAllUsers();
+  return result;
+};

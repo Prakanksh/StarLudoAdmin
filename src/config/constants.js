@@ -21,7 +21,9 @@ const resMessage = {
   USER_UPDATED : "User updated successfully",
   USER_BANNED : "User has been banned",
   USER_UNBANNED : "User has been unbanned",
-  KYC_UPDATED : "KYC status updated successfully"
+  KYC_UPDATED : "KYC status updated successfully",
+  USER_FETCHED: "User fetched successfully",      
+  USERS_FETCHED: "All users fetched successfully" 
 };
 
 module.exports = { statusCode, resMessage };

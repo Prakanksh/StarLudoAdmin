@@ -129,3 +129,53 @@ exports.deleteUser = async (userId) => {
     };
   }
 };
+
+exports.getUserById = async (userId) => {
+  try {
+    const User = getUserModel();
+    if (!User) throw new Error(resMessage.USER_MODEL_NOT_INITIALIZED);
+
+    const user = await User.findById(userId);
+    if (!user) {
+      return {
+        status: statusCode.NOT_FOUND,
+        success: false,
+        message: resMessage.USER_NOT_FOUND
+      };
+    }
+
+    return {
+      success: true,
+      status: statusCode.OK,
+      message: resMessage.USER_FETCHED,
+      data: user
+    };
+  } catch (error) {
+    return {
+      status: statusCode.INTERNAL_SERVER_ERROR,
+      success: false,
+      message: error.message || resMessage.Server_error
+    };
+  }
+};
+
+exports.getAllUsers = async () => {
+  try {
+    const User = getUserModel();
+    if (!User) throw new Error(resMessage.USER_MODEL_NOT_INITIALIZED);
+
+    const users = await User.find();
+    return {
+      success: true,
+      status: statusCode.OK,
+      message: resMessage.USERS_FETCHED,
+      data: users
+    };
+  } catch (error) {
+    return {
+      status: statusCode.INTERNAL_SERVER_ERROR,
+      success: false,
+      message: error.message || resMessage.Server_error
+    };
+  }
+};
