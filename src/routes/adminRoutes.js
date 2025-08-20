@@ -11,9 +11,5 @@ router.get('/dashboard', protect, responseHandler(getAdminDashboard));
 // Admin -> manage users
 router.post("/users", protect, responseHandler(createUser));
 router.delete("/users/:id", protect, responseHandler(deleteUser));
-// router.put("/users/:id", protect, responseHandler(updateUser)); 
-// router.patch("/users/:id/ban", protect, responseHandler(banUnbanUser)); 
-// router.patch("/users/:id/kyc", protect, responseHandler(verifyKYC)); 
-
 
 module.exports = router;

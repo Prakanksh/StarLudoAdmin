@@ -5,114 +5,127 @@ const getUserModel = require("../models/Users");
 const { statusCode, resMessage } = require("../config/constants");
 
 exports.login = async ({ email, password }) => {
-  const admin = await Admin.findOne({ email });
-  if (!admin) {
-    throw new Error(resMessage.INVALID_CREDENTIALS);
+  try {
+    const admin = await Admin.findOne({ email });
+    if (!admin) {
+      return {
+        status: statusCode.UNAUTHORIZED,
+        success: false,
+        message: resMessage.INVALID_CREDENTIALS
+      };
+    }
+
+    const isMatch = await bcrypt.compare(password, admin.password);
+    if (!isMatch) {
+      return {
+        status: statusCode.UNAUTHORIZED,
+        success: false,
+        message: resMessage.INVALID_CREDENTIALS
+      };
+    }
+
+    const token = jwt.sign(
+      { id: admin._id, email: admin.email },
+      process.env.JWT_SECRET,
+      { expiresIn: "1d" }
+    );
+
+    return {
+      success: true,
+      status: statusCode.OK,
+      message: resMessage.LOGIN_SUCCESS,
+      data: { id: admin._id, email: admin.email, token }
+    };
+  } catch (error) {
+    return {
+      status: statusCode.INTERNAL_SERVER_ERROR,
+      success: false,
+      message: error.message || resMessage.Server_error
+    };
   }
-
-  const isMatch = await bcrypt.compare(password, admin.password);
-  if (!isMatch) {
-    throw new Error(resMessage.INVALID_CREDENTIALS);
-  }
-
-  const token = jwt.sign(
-    { id: admin._id, email: admin.email },
-    process.env.JWT_SECRET,
-    { expiresIn: "1d" }
-  );
-
-  return {
-    success: true,
-    status: statusCode.OK,
-    message: resMessage.LOGIN_SUCCESS,
-    data: { id: admin._id, email: admin.email, token },
-  };
 };
 
 exports.getDashboard = async (adminId) => {
-  const admin = await Admin.findById(adminId).select("-password");
-  if (!admin) {
-    throw new Error(resMessage.ADMIN_NOT_FOUND);
-  }
+  try {
+    const admin = await Admin.findById(adminId).select("-password");
+    if (!admin) {
+      return {
+        status: statusCode.NOT_FOUND,
+        success: false,
+        message: resMessage.ADMIN_NOT_FOUND
+      };
+    }
 
-  return {
-    success: true,
-    status: statusCode.OK,
-    message: resMessage.DASHBOARD_FETCHED,
-    data: admin,
-  };
+    return {
+      success: true,
+      status: statusCode.OK,
+      message: resMessage.DASHBOARD_FETCHED,
+      data: admin
+    };
+  } catch (error) {
+    return {
+      status: statusCode.INTERNAL_SERVER_ERROR,
+      success: false,
+      message: error.message || resMessage.Server_error
+    };
+  }
 };
 
 exports.createUser = async ({ phone }) => {
-  const User = getUserModel();
-  if (!User) throw new Error(resMessage.USER_MODEL_NOT_INITIALIZED);
+  try {
+    const User = getUserModel();
+    if (!User) throw new Error(resMessage.USER_MODEL_NOT_INITIALIZED);
 
-  const existing = await User.findOne({ phone });
-  if (existing) throw new Error(resMessage.USER_EXISTS);
+    const existing = await User.findOne({ phone });
+    if (existing) {
+      return {
+        status: statusCode.CONFLICT,
+        success: false,
+        message: resMessage.USER_EXISTS
+      };
+    }
 
-  const newUser = await User.create({
-    phone,
-    isRegistered: false,
-  });
+    const newUser = await User.create({ phone, isRegistered: false });
 
-  return {
-    success: true,
-    status: statusCode.CREATED,
-    message: resMessage.USER_CREATED,
-    data: newUser,
-  };
+    return {
+      success: true,
+      status: statusCode.CREATED,
+      message: resMessage.USER_CREATED,
+      data: newUser
+    };
+  } catch (error) {
+    return {
+      status: statusCode.INTERNAL_SERVER_ERROR,
+      success: false,
+      message: error.message || resMessage.Server_error
+    };
+  }
 };
 
 exports.deleteUser = async (userId) => {
-  const User = getUserModel();
-  if (!User) throw new Error(resMessage.USER_MODEL_NOT_INITIALIZED);
+  try {
+    const User = getUserModel();
+    if (!User) throw new Error(resMessage.USER_MODEL_NOT_INITIALIZED);
 
-  const deleted = await User.findByIdAndDelete(userId);
-  if (!deleted) throw new Error(resMessage.USER_NOT_FOUND);
+    const deleted = await User.findByIdAndDelete(userId);
+    if (!deleted) {
+      return {
+        status: statusCode.NOT_FOUND,
+        success: false,
+        message: resMessage.USER_NOT_FOUND
+      };
+    }
 
-  return {
-    success: true,
-    status: statusCode.OK,
-    message: resMessage.USER_DELETED,
-  };
+    return {
+      success: true,
+      status: statusCode.OK,
+      message: resMessage.USER_DELETED
+    };
+  } catch (error) {
+    return {
+      status: statusCode.INTERNAL_SERVER_ERROR,
+      success: false,
+      message: error.message || resMessage.Server_error
+    };
+  }
 };
-
-// exports.updateUser = async (userId, updates) => {
-//   const User = getUserModel();
-//   const user = await User.findByIdAndUpdate(userId, updates, { new: true });
-//   if (!user) throw new Error(resMessage.USER_NOT_FOUND);
-
-//   return {
-//     success: true,
-//     status: statusCode.OK,
-//     message: resMessage.USER_UPDATED,
-//     data: user,
-//   };
-// };
-
-// exports.banUnbanUser = async (userId, isBanned) => {
-//   const User = getUserModel();
-//   const user = await User.findByIdAndUpdate(userId, { isBanned }, { new: true });
-//   if (!user) throw new Error(resMessage.USER_NOT_FOUND);
-
-//   return {
-//     success: true,
-//     status: statusCode.OK,
-//     message: isBanned ? resMessage.USER_BANNED : resMessage.USER_UNBANNED,
-//     data: user,
-//   };
-// };
-
-// exports.verifyKYC = async (userId, kycStatus) => {
-//   const User = getUserModel();
-//   const user = await User.findByIdAndUpdate(userId, { kycVerified: kycStatus }, { new: true });
-//   if (!user) throw new Error(resMessage.USER_NOT_FOUND);
-
-//   return {
-//     success: true,
-//     status: statusCode.OK,
-//     message: resMessage.KYC_UPDATED,
-//     data: user,
-//   };
-// };
-

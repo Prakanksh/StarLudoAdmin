@@ -20,17 +20,3 @@ exports.deleteUser = async (req) => {
   return result;
 };
 
-// exports.updateUser = async (req) => {
-//   const result = await adminService.updateUser(req.params.id, req.body);
-//   return result;
-// };
-
-// exports.banUnbanUser = async (req) => {
-//   const result = await adminService.banUnbanUser(req.params.id, req.body.isBanned);
-//   return result;
-// };
-
-// exports.verifyKYC = async (req) => {
-//   const result = await adminService.verifyKYC(req.params.id, req.body.kycStatus);
-//   return result;
-// };
