@@ -10,6 +10,7 @@ const userSchema = new mongoose.Schema(
     otpExpire: { type: Date },
     isRegistered: { type: Boolean, default: false },
     isBanned: { type: Boolean, default: false },
+    isActive: { type: Boolean, default: true },
     fullName: { type: String },         
     dob: { type: Date },                
     gender: { type: String },           
@@ -18,7 +19,7 @@ const userSchema = new mongoose.Schema(
     email: { type: String },            
     kycStatus: { 
       type: String, 
-      enum: ["Pending", "Active" , "Rejected"], 
+      enum: ["Pending", "Verified", "Rejected"], 
       default: "Pending" 
     } 
   },

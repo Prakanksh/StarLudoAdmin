@@ -160,17 +160,52 @@ exports.getUserById = async (userId) => {
   }
 };
 
-exports.getAllUsers = async () => {
+exports.getAllUsers = async (query) => {
   try {
     const User = getUserModel();
     if (!User) throw new Error(resMessage.USER_MODEL_NOT_INITIALIZED);
 
-    const users = await User.find();
+    const {
+      isActive,
+      isBanned,
+      search,
+      page = 1,
+      limit = 10
+    } = query;
+
+    // Build filter object
+    const filter = {};
+
+    if (isActive !== undefined) filter.isActive = isActive === "true"; 
+    if (isBanned !== undefined) filter.isBanned = isBanned === "true"; 
+
+    // Search by fullName, phone, email
+    if (search) {
+      filter.$or = [
+        { fullName: { $regex: search, $options: "i" } },
+        { phone: { $regex: search, $options: "i" } },
+        { email: { $regex: search, $options: "i" } }
+      ];
+    }
+
+    // Pagination
+    const skip = (page - 1) * limit;
+    const users = await User.find(filter)
+      .skip(skip)
+      .limit(Number(limit));
+
+    const total = await User.countDocuments(filter);
+
     return {
       success: true,
       status: statusCode.OK,
       message: resMessage.USERS_FETCHED,
-      data: users
+      data: {
+        users,
+        total,
+        page: Number(page),
+        pages: Math.ceil(total / limit)
+      }
     };
   } catch (error) {
     return {

@@ -26,7 +26,7 @@ exports.getUserById = async (req) => {
 };
 
 exports.getAllUsers = async (req) => {
-  const result = await adminService.getAllUsers();
+  const result = await adminService.getAllUsers(req.query);
   return result;
 };
 
