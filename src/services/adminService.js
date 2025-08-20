@@ -179,3 +179,35 @@ exports.getAllUsers = async () => {
     };
   }
 };
+
+exports.banUnbanUser = async (userId, isBanned) => {
+  try {
+    const User = getUserModel();
+    if (!User) throw new Error(resMessage.USER_MODEL_NOT_INITIALIZED);
+
+    const user = await User.findById(userId);
+    if (!user) {
+      return {
+        status: statusCode.NOT_FOUND,
+        success: false,
+        message: resMessage.USER_NOT_FOUND
+      };
+    }
+
+    user.isBanned = isBanned;
+    await user.save();
+
+    return {
+      success: true,
+      status: statusCode.OK,
+      message: isBanned ? resMessage.USER_BANNED : resMessage.USER_UNBANNED,
+      data: user
+    };
+  } catch (error) {
+    return {
+      status: statusCode.INTERNAL_SERVER_ERROR,
+      success: false,
+      message: error.message || resMessage.Server_error
+    };
+  }
+};

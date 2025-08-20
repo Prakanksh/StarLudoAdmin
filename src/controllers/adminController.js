@@ -29,3 +29,9 @@ exports.getAllUsers = async (req) => {
   const result = await adminService.getAllUsers();
   return result;
 };
+
+exports.banUnbanUser = async (req) => {
+  const result = await adminService.banUnbanUser(req.params.id, req.body.isBanned);
+  return result;
+};
+

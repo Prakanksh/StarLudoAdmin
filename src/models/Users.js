@@ -9,6 +9,7 @@ const userSchema = new mongoose.Schema(
     otp: { type: String },
     otpExpire: { type: Date },
     isRegistered: { type: Boolean, default: false },
+    isBanned: { type: Boolean, default: false }
   },
   { timestamps: true }
 );
@@ -16,7 +17,7 @@ const userSchema = new mongoose.Schema(
 // Attach model to user DB connection
 let User;
 userConnection.then((conn) => {
-  User = conn.model("User", userSchema, "users"); // 👈 force collection = "users"
+  User = conn.model("User", userSchema, "users"); 
 });
 
 module.exports = () => User;
