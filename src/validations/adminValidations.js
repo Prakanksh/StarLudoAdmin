@@ -16,6 +16,8 @@ const updateUserSchema = Joi.object({
   aadhaarNumber: Joi.string().pattern(/^\d{12}$/).optional(),
   address: Joi.string().max(200).optional(),
   email: Joi.string().email().optional(),
+  isBanned: Joi.boolean().optional(),
+  isActive: Joi.boolean().optional()
 });
 
 const banUserSchema = Joi.object({
