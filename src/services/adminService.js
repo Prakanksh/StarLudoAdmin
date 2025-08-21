@@ -3,7 +3,6 @@ const jwt = require("jsonwebtoken");
 const Admin = require("../models/Admin");
 const getUserModel = require("../models/Users");
 const { statusCode, resMessage } = require("../config/constants");
-const { verifyEKYC, maskAadhaar } = require("../utils/ekycUtils");
 
 exports.login = async ({ email, password }) => {
   try {
@@ -322,67 +321,3 @@ exports.updateUser = async (userId, userData) => {
   }
 };
 
-exports.verifyUserKYC = async (userId) => {
-  try {
-    const User = getUserModel();
-    if (!User) throw new Error(resMessage.USER_MODEL_NOT_INITIALIZED);
-
-    const user = await User.findById(userId);
-    if (!user) {
-      return {
-        status: statusCode.NOT_FOUND,
-        success: false,
-        message: resMessage.USER_NOT_FOUND
-      };
-    }
-
-    if (!user.aadhaarNumber || !user.fullName || !user.dob) {
-      return {
-        status: statusCode.BAD_REQUEST,
-        success: false,
-        message: "User must have Aadhaar number, full name, and DOB to verify KYC"
-      };
-    }
-
-    // Check if KYC is already verified
-    if (user.kycStatus === "Active") {
-      return {
-        status: statusCode.BAD_REQUEST,
-        success: false,
-        message: "KYC is already verified for this user",
-        data: { ...user.toObject(), aadhaarNumber: maskAadhaar(user.aadhaarNumber) }
-      };
-    }
-
-    // Call eKYC API
-    const ekycResult = await verifyEKYC(user.aadhaarNumber, user.fullName, user.dob);
-
-    if (ekycResult.success) {
-      user.kycStatus = "Active";
-      await user.save();
-
-      return {
-        status: statusCode.OK,
-        success: true,
-        message: resMessage.KYC_UPDATED,
-        data: { ...user.toObject(), aadhaarNumber: maskAadhaar(user.aadhaarNumber) }
-      };
-    } else {
-      user.kycStatus = "Rejected";
-      await user.save();
-
-      return {
-        status: statusCode.BAD_REQUEST,
-        success: false,
-        message: ekycResult.message || "KYC verification failed",
-        data: { ...user.toObject(), aadhaarNumber: maskAadhaar(user.aadhaarNumber) }
-      };
-    }
-  } catch (error) {
-    return {
-      status: statusCode.INTERNAL_SERVER_ERROR,
-      success: false,
-      message: error.message || resMessage.Server_error
-    };
-  }
-};

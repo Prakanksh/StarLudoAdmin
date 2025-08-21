@@ -23,6 +23,5 @@ router.get("/users/:id", protect, responseHandler(adminController.getUserById));
 router.get("/users", protect, validate(getAllUsersSchema, "query"), responseHandler(adminController.getAllUsers));
 router.patch("/users/:id/ban", protect, validate(banUserSchema), responseHandler(adminController.banUnbanUser));
 router.put("/users/:id", protect, validate(updateUserSchema), responseHandler(adminController.updateUser));
-router.patch("/users/:id/kyc", protect, responseHandler(adminController.verifyKYC));
 
 module.exports = router;

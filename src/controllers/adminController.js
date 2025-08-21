@@ -40,7 +40,3 @@ exports.updateUser = async (req) => {
   return result;
 };
 
-exports.verifyKYC = async (req) => {
-  const result = await adminService.verifyUserKYC(req.params.id);
-  return result;
-};
